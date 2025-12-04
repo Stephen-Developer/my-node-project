@@ -9,6 +9,15 @@ const userRoutes = require('./routes/userRoutes');
 app.use(express.json());
 app.use('/users', userRoutes);
 
+app.get('/health', async (req, res) => {
+    try {
+        await pool.query('SELECT 1');
+        res.status(200).json({ status: 'OK', db: 'Connected' });
+    } catch (err) {
+        res.status(500).json({ status: 'Error', db: 'Unavailable' });
+    }
+});
+
 app.use(errorHandler);
 
 //Start the server
