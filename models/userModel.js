@@ -14,8 +14,8 @@ const create = async ({ name, age }) => {
 };
 
 const resetAll = async () => {
-    await pool.query('DELETE FROM users');
-    return true;
+    const res = pool.query('DELETE FROM users');
+    return (await res).rowCount;
 };
 
 module.exports = {

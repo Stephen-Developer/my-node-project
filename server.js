@@ -3,10 +3,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const pool = require('./db');
+const errorHandler = require('./middleware/errorHandler');
 const userRoutes = require('./routes/userRoutes');
 
 app.use(express.json());
 app.use('/users', userRoutes);
+
+app.use(errorHandler);
 
 //Start the server
 const server = app.listen(PORT, () => {

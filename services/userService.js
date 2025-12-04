@@ -4,7 +4,9 @@ const processUserData = async (name, age) => {
     // Simulate processing (e.g., saving to database)
 
     if (age < 18) {
-        throw new Error('User must be at least 18 years old');
+        const err = new Error('User must be at least 18 years old');
+        err.status = 400;
+        throw err;
     }
 
     const newUser = await userModel.create({ name, age });
