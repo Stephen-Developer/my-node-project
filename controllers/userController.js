@@ -1,10 +1,26 @@
 const userService = require('../services/userService');
 
-const submitUserData = async (req, res) => {
-    const { name, age } = req.body;
+const createUser = async (req, res) => {
+    console.log("In userController - body:", req.body);
+    const { username, password } = req.body;
     
-    const result = await userService.processUserData(name, age);
+    console.log("Creating user with name:", username, "and age:", password);
+    const result = await userService.createNewUser(username, password);
+    if(result.error) {
+        return res.status(400).json({ message: result.error });
+    }
     res.status(200).json({ message: 'Data processed successfully', result });
+};
+
+const checkUserPassword = async (req, res) => {
+    const { username, password } = req.body;
+
+    const isValid = await userService.checkUserPassword(username, password);
+    if (isValid) {
+        res.status(200).json({ message: 'Password is valid' });
+    } else {
+        res.status(401).json({ message: 'Invalid password' });
+    }
 };
 
 const getUserData = async (req, res) => {
@@ -18,7 +34,8 @@ const resetUserData = async (req, res) => {
 };
 
 module.exports = {
-    submitUserData,
+    createUser,
+    checkUserPassword,
     getUserData,
     resetUserData
 };

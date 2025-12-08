@@ -1,19 +1,21 @@
 const { body, validationResult } = require('express-validator');
 
-const validateUserSubmit = [
-    body('name').isString().isLength({min: 1}),
-    body('age').isInt({ min: 0 }),
-    (req, res) => {
+const validateUserDetails = [
+    body('username')
+        .isString().withMessage('Username must be a string')
+        .isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
+    body('password')
+        .isString().withMessage('Password must be a string')
+        .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+    (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            const err = new Error('Invalid Input');
-            err.status = 400;
-            err.details = errors.array();
-            throw err;
+            return res.status(400).json({ errors: errors.array() });
         }
+        next();
     }
 ];
 
 module.exports = {
-    validateUserSubmit
+    validateUserDetails
 };
