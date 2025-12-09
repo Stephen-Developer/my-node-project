@@ -1,10 +1,8 @@
 const userService = require('../services/userService');
 
 const createUser = async (req, res) => {
-    console.log("In userController - body:", req.body);
     const { username, password } = req.body;
     
-    console.log("Creating user with name:", username, "and age:", password);
     const result = await userService.createNewUser(username, password);
     if(result.error) {
         return res.status(400).json({ message: result.error });

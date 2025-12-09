@@ -1,4 +1,3 @@
-const { get } = require('http');
 const pool = require('../db');
 
 const findAll = async () => {
@@ -7,7 +6,6 @@ const findAll = async () => {
 };
 
 const create = async ({ username, password }) => {
-    console.log("In userModel - creating user:", username, password);
     const res = await pool.query(
         'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *',
         [username, password]
@@ -16,7 +14,6 @@ const create = async ({ username, password }) => {
 };
 
 const getPasswordHash = async (username) => {
-    console.log("In userModel - fetching password hash for user:", username);
     const res = await pool.query(
         'SELECT password FROM users WHERE username = $1',
         [username]
