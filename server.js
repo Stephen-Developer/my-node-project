@@ -1,3 +1,4 @@
+const { swaggerUi, specs } = require('./swagger');
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.get('/health', async (req, res) => {
     }
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(errorHandler);
 
 //Start the server
