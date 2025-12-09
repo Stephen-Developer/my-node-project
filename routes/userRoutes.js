@@ -60,12 +60,7 @@ router.post('/login', userValidation.validateUserDetails, asyncHandler(userContr
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   username:
- *                     type: string
- *                   password:
- *                     type: string
+ *                 $ref: '#/components/schemas/User'
  */
 router.get('/', asyncHandler(userController.getUserData));
 
