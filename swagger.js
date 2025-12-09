@@ -9,6 +9,24 @@ const options = {
             version: '1.0.0',
             description: 'Learning project for user management with Express and PostgreSQL',
         },
+        components: {
+            schemas: {
+                User: {
+                    type: 'object',
+                    properties: {
+                        username: {
+                            type: 'string',
+                            example: 'johndoe',
+                        },
+                        password: {
+                            type: 'string',
+                            example: 'strongpassword123',
+                        },
+                    },
+                    required: ['username', 'password'],
+                },
+            },
+        }
     },
     apis: ['./routes/*.js'], // files containing annotations as above
 };

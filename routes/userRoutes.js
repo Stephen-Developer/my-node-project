@@ -17,12 +17,7 @@ const userValidation = require('../middleware/userValidation');
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: New user created successfully
@@ -42,12 +37,7 @@ router.post('/createNewUser', userValidation.validateUserDetails, asyncHandler(u
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: Password is valid
