@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const pool = require('../db');
 
 /**
  * @swagger
- * /health:
+ * /:
  *   get:
  *     summary: Health check endpoint
  *     tags: [Health]
