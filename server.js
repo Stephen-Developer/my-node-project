@@ -6,20 +6,16 @@ const PORT = process.env.PORT || 3000;
 const pool = require('./db');
 const errorHandler = require('./middleware/errorHandler');
 const userRoutes = require('./routes/userRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 
+//Middleware
 app.use(express.json());
+//Routes
 app.use('/users', userRoutes);
-
-app.get('/health', async (req, res) => {
-    try {
-        await pool.query('SELECT 1');
-        res.status(200).json({ status: 'OK', db: 'Connected' });
-    } catch (err) {
-        res.status(500).json({ status: 'Error', db: 'Unavailable' });
-    }
-});
-
+app.use('/', healthRoutes);
+//Swagger setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+//Error handling middleware
 app.use(errorHandler);
 
 //Start the server
