@@ -1,44 +1,42 @@
-const crypto = require('crypto');
-const userModel = require('../models/userModel');
+import crypto from 'crypto';
+import * as userModel from '../models/userModel';
+
+interface User {
+    username: string;
+    password: string;
+}
 
 //Helper functions
-const hashPassword = (password, salt=crypto.randomBytes(16).toString('hex')) => {
+const hashPassword = (password: string, salt=crypto.randomBytes(16).toString('hex')): string => {
     const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
     return `${salt}:${hash}`;
 };
 
-const verifyPassword = (password, storedHash) => {
+const verifyPassword = (password: string, storedHash: string): boolean => {
     const [salt, hash] = storedHash.split(':');
     const hashAttempt = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
     return hash === hashAttempt;
 };
 
 //Service functions
-const createNewUser = async (username, password) => {
+export const createNewUser = async (username: string, password: string): Promise<User> => {
     const hashedPassword = hashPassword(password);
     const newUser = await userModel.create({ username, password: hashedPassword });
     return newUser;
 };
 
-const checkUserPassword = async (userId, password) => {
-    const storedHash = await userModel.getPasswordHash(userId);
+export const checkUserPassword = async (username: string, password: string): Promise<boolean> => {
+    const storedHash = await userModel.getPasswordHash(username);
     const isMatch = verifyPassword(password, storedHash);
     return isMatch;
 };
 
-const fetchUserData = async () => {
+export const fetchUserData = async (): Promise<User[]> => {
     const users = await userModel.findAll();
     return users;
 };
 
-const resetData = async () => {
+export const resetData = async (): Promise<number|null> => {
     const result = await userModel.resetAll();
     return result;
-}
-
-module.exports = {
-    createNewUser,
-    checkUserPassword,
-    fetchUserData,
-    resetData
 };

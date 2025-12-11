@@ -47,6 +47,11 @@ A small Express + PostgreSQL project created as a learning sandbox. Its primary 
     ```
    - DB init script: `db/init.sql`.
 
+2. Reset services, needed to run init.sql again:
+    ```sh
+    docker-compose down -v
+    ```
+
 ## Important endpoints
 
 - POST `/users/createNewUser` — create a user (validation applied)

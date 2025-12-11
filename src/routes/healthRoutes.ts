@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const pool = require('../db');
+import { Request, Response, Router } from 'express';
+import { pool } from '../db';
+
+const router = Router();
 
 /**
  * @swagger
@@ -14,7 +15,7 @@ const pool = require('../db');
  *       500:
  *         description: Service is unhealthy
  */
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
     try {
         await pool.query('SELECT 1');
         res.status(200).json({ status: 'OK', db: 'Connected' });
@@ -23,4 +24,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

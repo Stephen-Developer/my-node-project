@@ -1,16 +1,29 @@
+# ---------- Build Stage ----------
+FROM node:18-alpine AS builder
+
+WORKDIR /usr/src/app
+
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+
+# ---------- Production Stage ----------
 FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-#Install dependencies
 COPY package.json package-lock.json* ./
 RUN npm install --only=production
 
-#Copy app files
-COPY . .
+# Copy compiled JS
+COPY --from=builder /usr/src/app/dist ./dist
 
-#Expose port
+# Copy .env file
+# COPY .env .env
+
 EXPOSE 3000
 
-#Start the app
-CMD ["node", "server.js"]
+CMD ["node", "dist/server.js"]

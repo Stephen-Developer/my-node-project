@@ -1,12 +1,12 @@
-const { swaggerUi, specs } = require('./swagger');
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
+import express, {Application} from 'express';
+import { swaggerUi, specs } from './swagger';
+import {pool} from './db';
+import { errorHandler } from './middleware/errorHandler';
+import userRoutes from './routes/userRoutes';
+import healthRoutes from './routes/healthRoutes';
 
-const pool = require('./db');
-const errorHandler = require('./middleware/errorHandler');
-const userRoutes = require('./routes/userRoutes');
-const healthRoutes = require('./routes/healthRoutes');
+const app: Application = express();
+const PORT = process.env.PORT || 3000;
 
 //Middleware
 app.use(express.json());
