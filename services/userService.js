@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const userModel = require('../models/userModel');
 
 //Helper functions
-const hashPassowrd = (password, salt=crypto.randomBytes(16).toString('hex')) => {
+const hashPassword = (password, salt=crypto.randomBytes(16).toString('hex')) => {
     const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
     return `${salt}:${hash}`;
 };
@@ -15,7 +15,7 @@ const verifyPassword = (password, storedHash) => {
 
 //Service functions
 const createNewUser = async (username, password) => {
-    const hashedPassword = hashPassowrd(password);
+    const hashedPassword = hashPassword(password);
     const newUser = await userModel.create({ username, password: hashedPassword });
     return newUser;
 };
