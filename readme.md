@@ -1,6 +1,6 @@
 # My Node Project — Learning Sandbox
 
-A small Express + PostgreSQL project created as a learning sandbox. Its primary purpose is for you to learn how to build simple APIs, work with a database, validate input, and handle password hashing — not to be production-ready.
+A small Express + PostgreSQL project created as a learning sandbox. Its primary purpose is for me to learn how to build simple APIs, work with a database, validate input, and handle password hashing — not to be production-ready.
 
 ## Quick overview
 
@@ -43,13 +43,13 @@ A small Express + PostgreSQL project created as a learning sandbox. Its primary 
 
 1. Start services:
     ```sh
-    docker-compose up --build
+    docker compose up --build
     ```
-   - DB init script: `db/init.sql`.
+   - DB init script: `src/db/init.sql`.
 
 2. Reset services, needed to run init.sql again:
     ```sh
-    docker-compose down -v
+    docker compose down -v
     ```
 
 ## Important endpoints
@@ -73,10 +73,5 @@ See route definitions in `routes/userRoutes.js`.
     ```sh
     node tests/test-db.js
     ```
-
-## Files of interest
-
-- `server.js`, `db.js`, `package.json`, `Dockerfile`, `docker-compose.yml`
-- `controllers/`, `services/`, `models/`, `routes/`, `middleware/`, `utils/`
 
 ---
