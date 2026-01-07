@@ -4,7 +4,7 @@ FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
 
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm ci --silent
 
 COPY . .
 RUN npm run build
@@ -15,8 +15,9 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
+ENV NODE_ENV=production
 COPY package.json package-lock.json* ./
-RUN npm install --only=production
+RUN npm ci --omit=dev --silent
 
 # Copy compiled JS
 COPY --from=builder /usr/src/app/dist ./dist
