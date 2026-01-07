@@ -1,27 +1,21 @@
 //Look into abstracting controller logic using an interface pattern
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
-
-interface UserBody {
-    username: string;
-    password: string;
-}
+import { User } from '../types/user';
 
 export const createUser = async (
-    req: Request<{}, {}, UserBody>, 
+    req: Request<{}, {}, User>, 
     res: Response
 ) : Promise<void> => {
     const { username, password } = req.body;
     
     const result = await userService.createNewUser(username, password);
-    // if(result.error) {
-    //     return res.status(400).json({ message: result.error });
-    // }
+    
     res.status(200).json({ message: 'Data processed successfully', result });
 };
 
 export const checkUserPassword = async (
-    req: Request<{}, {}, UserBody>,
+    req: Request<{}, {}, User>,
     res: Response
 ) : Promise<void> => {
     const { username, password } = req.body;
