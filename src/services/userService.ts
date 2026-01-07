@@ -1,10 +1,6 @@
 import crypto from 'crypto';
 import * as userModel from '../models/userModel';
-
-interface User {
-    username: string;
-    password: string;
-}
+import { User } from '../types/user';
 
 //Helper functions
 const hashPassword = (password: string, salt=crypto.randomBytes(16).toString('hex')): string => {
@@ -27,6 +23,9 @@ export const createNewUser = async (username: string, password: string): Promise
 
 export const checkUserPassword = async (username: string, password: string): Promise<boolean> => {
     const storedHash = await userModel.getPasswordHash(username);
+    if (!storedHash) {
+        return false; // User not found
+    }
     const isMatch = verifyPassword(password, storedHash);
     return isMatch;
 };

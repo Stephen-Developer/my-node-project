@@ -1,10 +1,6 @@
 //Refactor to use User as a class model
 import { pool } from '../db';
-
-interface User {
-    username: string;
-    password: string;
-}
+import { User } from '../types/user';
 
 export const findAll = async (): Promise<User[]> => {
     const res = await pool.query('SELECT * FROM users');
@@ -19,7 +15,7 @@ export const create = async ({ username, password }: User): Promise<User> => {
     return res.rows[0];
 };
 
-export const getPasswordHash = async (username: string): Promise<string> => {
+export const getPasswordHash = async (username: string): Promise<string|null> => {
     const res = await pool.query(
         'SELECT password FROM users WHERE username = $1',
         [username]
