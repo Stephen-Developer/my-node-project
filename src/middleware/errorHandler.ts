@@ -1,13 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { HttpError } from '../types/httpError';
+import { isHttpError } from '../types/httpError';
 
 export const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
-    if (!(err instanceof Error)) {
-        return res.status(500).json({ message: 'An unknown error occurred' });
+
+    if(isHttpError(err)) {
+        const status = err.status || 500;
+        const message = process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message;
+        res.status(status).json({ message });
+        return;
     }
-    const httpError = err as HttpError;
-    const status = httpError.status || 500;
-    const message = process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message;
-    res.status(status).json({ message });
+
+    if(err instanceof Error) {
+        const message = process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message;
+        res.status(500).json({ message });
+        return;
+    }
+
+    res.status(500).json({ message: 'Internal Server Error' });
 }
