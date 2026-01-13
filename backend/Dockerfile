@@ -3,10 +3,11 @@ FROM node:18-alpine AS builder
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 RUN npm ci --silent
 
-COPY . .
+COPY tsconfig.json ./
+COPY src ./src
 RUN npm run build
 
 
@@ -16,7 +17,7 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --silent
 
 # Copy compiled JS

@@ -1,5 +1,6 @@
 import express, {Application} from 'express';
 import { swaggerUi, specs } from './swagger';
+import cors from 'cors';
 import {pool} from './db';
 import { errorHandler } from './middleware/errorHandler';
 import userRoutes from './routes/userRoutes';
@@ -10,6 +11,9 @@ const PORT = process.env.PORT || 3000;
 
 //Middleware
 app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:8080'
+    }));
 //Routes
 app.use('/users', userRoutes);
 app.use('/', healthRoutes);
