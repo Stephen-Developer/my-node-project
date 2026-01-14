@@ -48,34 +48,37 @@ describe("User Model", () => {
     });
 
     test("creates a user", async () => { 
-        const { create } = await import("../src/models/userModel");
-        
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
+
         console.log("Creating user 'alice'");
-        const user = await create({ username: "alice", password: "secret" }, client); 
+        const user = await userModel.create({ username: "alice", password: "secret" }, client); 
         
         expect(user.username).toBe("alice");
         expect(user).toHaveProperty("password");
     });
 
     test("retrieves password hash correctly", async () => {
-        const { create, getPasswordHash } = await import("../src/models/userModel");
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
 
-        const user = await create({ username: "bob", password: "mypassword" }, client);
+        const user = await userModel.create({ username: "bob", password: "mypassword" }, client);
 
         console.log("Retrieving password hash for 'bob'");
-        const hash = await getPasswordHash("bob", client);
+        const hash = await userModel.getPasswordHash("bob", client);
 
         expect(hash).toBe(user.password);
     });
 
     test("finds all users", async () => {
-        const { create, findAll } = await import("../src/models/userModel");
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
 
-        await create({ username: "eve", password: "1234" }, client);
-        await create({ username: "frank", password: "5678" }, client);
+        await userModel.create({ username: "eve", password: "1234" }, client);
+        await userModel.create({ username: "frank", password: "5678" }, client);
         
         console.log("Finding all users");
-        const users = await findAll(client);
+        const users = await userModel.findAll(client);
 
         expect(users.length).toBe(2);
 
@@ -85,46 +88,49 @@ describe("User Model", () => {
     });
 
     test("resets all users", async () => {
-        const { create, resetAll, findAll } = await import("../src/models/userModel");
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
 
-        await create({ username: "charlie", password: "pass1" }, client);
-        await create({ username: "dave", password: "pass2" }, client);
+        await userModel.create({ username: "charlie", password: "pass1" }, client);
+        await userModel.create({ username: "dave", password: "pass2" }, client);
 
-        let users = await findAll(client);
+        let users = await userModel.findAll(client);
         expect(users.length).toBe(2);
 
         console.log("Resetting all users");
-        const deletedCount = await resetAll(client);
-
+        const deletedCount = await userModel.resetAll(client);
         expect(deletedCount).toBe(2);
 
-        users = await findAll(client);
+        users = await userModel.findAll(client);
         expect(users.length).toBe(0);
     });
 
     test("password for non-existent user returns null", async () => {
-        const { getPasswordHash } = await import("../src/models/userModel");
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
 
         console.log("Retrieving password hash for non-existent user 'nonuser'");
-        const hash = await getPasswordHash("nonuser", client);
+        const hash = await userModel.getPasswordHash("nonuser", client);
 
         expect(hash).toBeNull();
     });
 
     test("resetAll on empty table returns zero", async () => {
-        const { resetAll } = await import("../src/models/userModel");
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
 
         console.log("Resetting all users on empty table");
-        const deletedCount = await resetAll(client);
+        const deletedCount = await userModel.resetAll(client);
 
         expect(deletedCount).toBe(0);
     });
 
     test("findAll on empty table returns empty array", async () => {
-        const { findAll } = await import("../src/models/userModel");
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
 
         console.log("Finding all users on empty table");
-        const users = await findAll(client);
+        const users = await userModel.findAll(client);
 
         expect(users).toEqual([]);
     });
