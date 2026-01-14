@@ -5,9 +5,9 @@ dotenv.config();
 
 export const pool = new Pool({
     user: process.env.DB_USER,
-    host: process.env.DB_HOST || 'db',
+    host: process.env.DB_HOST ?? "localhost",
     database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
+    password: process.env.DB_PASSWORD ?? process.env.DB_PASS,
     port: parseInt(process.env.DB_PORT || '5432', 10),
     max: parseInt(process.env.DB_MAX_CLIENTS || '20', 10),
     idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000', 10),

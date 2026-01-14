@@ -1,29 +1,40 @@
 //Refactor to use User as a class model
 import { pool } from '../db';
+import { Pool, PoolClient } from 'pg';
 import { User } from '../types/user';
 
-export const findAll = async (): Promise<User[]> => {
-    const res = await pool.query('SELECT * FROM users');
+export const findAll = async (client?: Pool | PoolClient): Promise<User[]> => {
+    const db = client ?? pool;
+    const res = await db.query('SELECT * FROM users');
     return res.rows;
 };
 
-export const create = async ({ username, password }: User): Promise<User> => {
-    const res = await pool.query(
+export const create = async (
+    { username, password }: User,
+    client?: Pool | PoolClient
+): Promise<User> => {
+    const db = client ?? pool;
+    const res = await db.query(
         'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *',
         [username, password]
     );
     return res.rows[0];
 };
 
-export const getPasswordHash = async (username: string): Promise<string|null> => {
-    const res = await pool.query(
+export const getPasswordHash = async (
+    username: string,
+    client?: Pool | PoolClient
+): Promise<string | null> => {
+    const db = client ?? pool;
+    const res = await db.query(
         'SELECT password FROM users WHERE username = $1',
         [username]
     );
-    return res.rows[0]?.password;
-}
+    return res.rows[0]?.password ?? null;
+};
 
-export const resetAll = async (): Promise<number|null> => {
-    const res = pool.query('DELETE FROM users');
-    return (await res).rowCount;
+export const resetAll = async (client?: Pool | PoolClient): Promise<number> => {
+    const db = client ?? pool;
+    const res = await db.query('DELETE FROM users');
+    return res.rowCount ?? 0;
 };
