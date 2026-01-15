@@ -1,26 +1,18 @@
-import crypto from 'crypto';
+
 import { User } from '../types/user';
 import { IUserModel } from '../models/IUserModel';
 import { IUserService } from './IUserService';
+import { IPasswordService } from './IPasswordService';
 
 export class UserService implements IUserService {
-    constructor(private userModel: IUserModel) {}
-
-    //Helper functions
-    hashPassword = (password: string, salt = crypto.randomBytes(16).toString('hex')): string => {
-        const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
-        return `${salt}:${hash}`;
-    };
-
-    verifyPassword = (password: string, storedHash: string): boolean => {
-        const [salt, hash] = storedHash.split(':');
-        const hashAttempt = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
-        return hash === hashAttempt;
-    };
+    constructor(
+        private userModel: IUserModel,
+        private passwordService: IPasswordService
+    ) {}
 
     //Service functions
     createNewUser = async (username: string, password: string): Promise<User> => {
-        const hashedPassword = this.hashPassword(password);
+        const hashedPassword = this.passwordService.hashPassword(password);
         const newUser = await this.userModel.create({ username, password: hashedPassword });
         return newUser;
     };
@@ -30,7 +22,7 @@ export class UserService implements IUserService {
         if (!storedHash) {
             return false; // User not found
         }
-        const isMatch = this.verifyPassword(password, storedHash);
+        const isMatch = this.passwordService.verifyPassword(password, storedHash);
         return isMatch;
     };
 
