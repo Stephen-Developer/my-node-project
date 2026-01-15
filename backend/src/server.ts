@@ -3,7 +3,7 @@ import { swaggerUi, specs } from './swagger';
 import cors from 'cors';
 import {pool} from './db';
 import { errorHandler } from './middleware/errorHandler';
-import { UserRouterInstance } from './services/index';
+import userRoutes from './routes/userRoutes';
 import healthRoutes from './routes/healthRoutes';
 
 const app: Application = express();
@@ -15,7 +15,7 @@ app.use(cors({
     origin: 'http://localhost:8080'
     }));
 //Routes
-app.use('/users', UserRouterInstance.router);
+app.use('/users', userRoutes);
 app.use('/', healthRoutes);
 //Swagger setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));

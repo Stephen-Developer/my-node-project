@@ -1,12 +1,12 @@
 import { Request, Response, Router} from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
+import * as userController from '../controllers/userController';
 import * as userValidation from '../middleware/userValidation'
-import { IUserController } from '../controllers/IUserController';
 
 export class UserRouter {
     public router: Router;
     
-    constructor(private userController: IUserController) {
+    constructor() {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -31,7 +31,7 @@ export class UserRouter {
          *       400:
          *         description: New user creation failed
          */
-        this.router.post('/createNewUser', userValidation.validateUserDetails, asyncHandler(this.userController.createUser));
+        this.router.post('/createNewUser', userValidation.validateUserDetails, asyncHandler(userController.createUser));
         
         /**
          * @swagger
@@ -51,7 +51,7 @@ export class UserRouter {
          *       401:
          *         description: Invalid password
          */
-        this.router.post('/login', userValidation.validateUserDetails, asyncHandler(this.userController.checkUserPassword));
+        this.router.post('/login', userValidation.validateUserDetails, asyncHandler(userController.checkUserPassword));
         
         /**
          * @swagger
@@ -69,7 +69,7 @@ export class UserRouter {
          *               items:
          *                 $ref: '#/components/schemas/User'
          */
-        this.router.get('/', asyncHandler(this.userController.getUserData));
+        this.router.get('/', asyncHandler(userController.getUserData));
         
         /**
          * @swagger
@@ -83,6 +83,8 @@ export class UserRouter {
          *       400:
          *         description: User data reset failed
          */
-        this.router.get('/reset', asyncHandler(this.userController.resetUserData));
+        this.router.get('/reset', asyncHandler(userController.resetUserData));
     }
 }
+
+export default new UserRouter().router;
