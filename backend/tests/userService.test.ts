@@ -2,9 +2,9 @@ import { UserService } from "../src/services/userService";
 import { IUserModel } from "../src/models/IUserModel";
 import { IPasswordService } from "../src/services/IPasswordService";
 import { User } from "../src/types/user";
-import { createMockUserModel, createMockPasswordService } from "./mockFactory";
+import { createMockUserModel, createMockPasswordService, clearAllMocks } from "./mockFactory";
 
-describe ("User Service", () => {
+describe("User Service", () => {
     let userService: UserService;
     let mockUserModel: jest.Mocked<IUserModel>;
     let mockPasswordService: jest.Mocked<IPasswordService>;
@@ -16,9 +16,13 @@ describe ("User Service", () => {
         userService = new UserService(mockUserModel, mockPasswordService);
     });
 
+    afterEach(() => {
+        clearAllMocks();
+    });
+
     test("creates a new user", async () => {
         const plainPassword = "plaintextpassword";
-        const expectedUser : User = {
+        const expectedUser: User = {
             username: "testuser",
             password: "hashedpassword"
         }
@@ -38,7 +42,7 @@ describe ("User Service", () => {
 
     test("tries to create a user with existing username", async () => {
         const plainPassword = "plaintextpassword";
-        const expectedUser : User = {
+        const expectedUser: User = {
             username: "existinguser",
             password: "hashedpassword"
         }
@@ -129,7 +133,7 @@ describe ("User Service", () => {
         mockUserModel.resetAll.mockResolvedValue(5);
 
         const result = await userService.resetData();
-        
+
         expect(mockUserModel.resetAll).toHaveBeenCalled();
         expect(result).toBe(5);
     });
@@ -138,7 +142,7 @@ describe ("User Service", () => {
         mockUserModel.resetAll.mockResolvedValue(0);
 
         const result = await userService.resetData();
-        
+
         expect(mockUserModel.resetAll).toHaveBeenCalled();
         expect(result).toBe(0);
     });

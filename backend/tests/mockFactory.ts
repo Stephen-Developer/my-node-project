@@ -26,3 +26,7 @@ export function createMockPasswordService(): jest.Mocked<IPasswordService> {
         verifyPassword: jest.fn()
     };
 }
+
+export function clearAllMocks() {
+    jest.clearAllMocks();
+}

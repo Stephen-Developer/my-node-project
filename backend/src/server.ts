@@ -9,10 +9,15 @@ import healthRoutes from './routes/healthRoutes';
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+    'http://localhost:8080',
+    'http://localhost:5173'
+];
+
 //Middleware
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:8080'
+    origin: allowedOrigins
     }));
 //Routes
 app.use('/users', UserRouterInstance.router);

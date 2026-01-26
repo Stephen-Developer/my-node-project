@@ -12,10 +12,10 @@ describe("User Model", () => {
 
     beforeAll(async () => {
         container = await new PostgreSqlContainer("postgres:15-alpine")
-        .withDatabase("testdb")
-        .withUsername("testuser")
-        .withPassword("testpass")
-        .start();
+            .withDatabase("testdb")
+            .withUsername("testuser")
+            .withPassword("testpass")
+            .start();
 
         // Set env vars BEFORE importing your model/db 
         process.env.DB_HOST = container.getHost();
@@ -46,16 +46,16 @@ describe("User Model", () => {
         client.release();
     });
 
-    test("creates a user", async () => { 
+    test("creates a user", async () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        const expectedUser : User = {
+        const expectedUser: User = {
             username: "alice",
             password: "secret"
         }
 
-        const user = await userModel.create(expectedUser, client); 
+        const user = await userModel.create(expectedUser, client);
 
         expect(user).toMatchObject<User>(expectedUser);
     });

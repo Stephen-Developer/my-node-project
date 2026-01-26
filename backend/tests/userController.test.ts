@@ -2,7 +2,7 @@ import { UserController } from '../src/controllers/userController';
 import { IUserService } from '../src/services/IUserService';
 import { User } from '../src/types/user';
 import { Request, Response } from 'express';
-import { createMockUserService } from './mockFactory';
+import { clearAllMocks, createMockUserService } from './mockFactory';
 
 describe("User Controller", () => {
     let userController: UserController;
@@ -14,16 +14,20 @@ describe("User Controller", () => {
         userController = new UserController(mockUserService);
     });
 
+    afterEach(() => {
+        clearAllMocks();
+    });
+
     test("creates a new user and sends response", async () => {
 
-        const req : Partial<Request<{}, {}, User>> = {
+        const req: Partial<Request<{}, {}, User>> = {
             body: {
                 username: "testuser",
                 password: "plaintextpassword"
             }
         };
 
-        const res : Partial<Response> = {
+        const res: Partial<Response> = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
@@ -47,16 +51,16 @@ describe("User Controller", () => {
     });
 
     test("checks user password and sends valid response", async () => {
-        const req : Partial<Request<{}, {}, User>> = {
+        const req: Partial<Request<{}, {}, User>> = {
             body: {
                 username: "testuser",
                 password: "plaintextpassword"
             }
         };
 
-        const res : Partial<Response> = {
-            status : jest.fn().mockReturnThis(),
-            json : jest.fn()
+        const res: Partial<Response> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
         };
 
         mockUserService.checkUserPassword.mockResolvedValue(true);
@@ -69,16 +73,16 @@ describe("User Controller", () => {
     });
 
     test("checks user password and sends invalid response", async () => {
-        const req : Partial<Request<{}, {}, User>> = {
+        const req: Partial<Request<{}, {}, User>> = {
             body: {
                 username: "testuser",
                 password: "wrongpassword"
             }
         };
 
-        const res : Partial<Response> = {
-            status : jest.fn().mockReturnThis(),
-            json : jest.fn()
+        const res: Partial<Response> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
         };
 
         mockUserService.checkUserPassword.mockResolvedValue(false);
@@ -91,11 +95,11 @@ describe("User Controller", () => {
     });
 
     test("fetches user data and sends response", async () => {
-        const req : Partial<Request> = {};
+        const req: Partial<Request> = {};
 
-        const res : Partial<Response> = {
-            status : jest.fn().mockReturnThis(),
-            json : jest.fn()
+        const res: Partial<Response> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
         };
 
         mockUserService.fetchUserData.mockResolvedValue([
@@ -116,15 +120,15 @@ describe("User Controller", () => {
     });
 
     test("resets user data and sends response", async () => {
-        const req : Partial<Request> = {};
-        
-        const res : Partial<Response> = {
-            status : jest.fn().mockReturnThis(),
-            json : jest.fn()
+        const req: Partial<Request> = {};
+
+        const res: Partial<Response> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
         };
 
         mockUserService.resetData.mockResolvedValue(5);
-        
+
         await userController.resetUserData(req as Request, res as Response);
         expect(mockUserService.resetData).toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(200);
