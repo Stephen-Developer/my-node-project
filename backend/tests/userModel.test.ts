@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { StartedPostgreSqlContainer, PostgreSqlContainer } from "@testcontainers/postgresql";
 import { runQuery } from "../src/utils/sqlQueryRunner";
+import { User } from "../src/types/user";
 
 describe("User Model", () => {
     jest.setTimeout(60000);
@@ -17,22 +18,20 @@ describe("User Model", () => {
         .start();
 
         // Set env vars BEFORE importing your model/db 
-        process.env.DB_HOST = container.getHost(); 
-        process.env.DB_PORT = container.getMappedPort(5432).toString(); 
-        process.env.DB_USER = container.getUsername(); 
-        process.env.DB_PASS = container.getPassword(); 
+        process.env.DB_HOST = container.getHost();
+        process.env.DB_PORT = container.getMappedPort(5432).toString();
+        process.env.DB_USER = container.getUsername();
+        process.env.DB_PASS = container.getPassword();
         process.env.DB_NAME = container.getDatabase();
 
         // Now import your model AFTER env vars are set 
         const dbModule = await import("../src/db");
         pool = dbModule.pool;
 
-        console.log("Initializing database schema");
         await runQuery(pool, "../db/init.sql");
     });
 
     afterAll(async () => {
-        console.log("Closing DB pool and stopping container");
         await pool.end();
         await container.stop();
     });
@@ -51,21 +50,28 @@ describe("User Model", () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        console.log("Creating user 'alice'");
-        const user = await userModel.create({ username: "alice", password: "secret" }, client); 
-        
-        expect(user.username).toBe("alice");
-        expect(user).toHaveProperty("password");
+        const expectedUser : User = {
+            username: "alice",
+            password: "secret"
+        }
+
+        const user = await userModel.create(expectedUser, client); 
+
+        expect(user).toMatchObject<User>(expectedUser);
     });
 
     test("retrieves password hash correctly", async () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        const user = await userModel.create({ username: "bob", password: "mypassword" }, client);
+        const expectedUser: User = {
+            username: "bob",
+            password: "mypassword"
+        }
 
-        console.log("Retrieving password hash for 'bob'");
-        const hash = await userModel.getPasswordHash("bob", client);
+        const user = await userModel.create(expectedUser, client);
+
+        const hash = await userModel.getPasswordHash(expectedUser.username, client);
 
         expect(hash).toBe(user.password);
     });
@@ -74,30 +80,36 @@ describe("User Model", () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        await userModel.create({ username: "eve", password: "1234" }, client);
-        await userModel.create({ username: "frank", password: "5678" }, client);
-        
-        console.log("Finding all users");
+        const expectedUsers: User[] = [
+            { username: "eve", password: "1234" },
+            { username: "frank", password: "5678" }
+        ];
+
+        await userModel.create(expectedUsers[0], client);
+        await userModel.create(expectedUsers[1], client);
+
         const users = await userModel.findAll(client);
 
         expect(users.length).toBe(2);
 
-        const usernames = users.map(u => u.username);
-        expect(usernames).toContain("eve");
-        expect(usernames).toContain("frank");
+        expect(users).toMatchObject<User[]>(expectedUsers);
     });
 
     test("resets all users", async () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        await userModel.create({ username: "charlie", password: "pass1" }, client);
-        await userModel.create({ username: "dave", password: "pass2" }, client);
+        const expectedUsers: User[] = [
+            { username: "charlie", password: "pass1" },
+            { username: "dave", password: "pass2" }
+        ];
+
+        await userModel.create(expectedUsers[0], client);
+        await userModel.create(expectedUsers[1], client);
 
         let users = await userModel.findAll(client);
         expect(users.length).toBe(2);
 
-        console.log("Resetting all users");
         const deletedCount = await userModel.resetAll(client);
         expect(deletedCount).toBe(2);
 
@@ -109,7 +121,6 @@ describe("User Model", () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        console.log("Retrieving password hash for non-existent user 'nonuser'");
         const hash = await userModel.getPasswordHash("nonuser", client);
 
         expect(hash).toBeNull();
@@ -119,7 +130,6 @@ describe("User Model", () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        console.log("Resetting all users on empty table");
         const deletedCount = await userModel.resetAll(client);
 
         expect(deletedCount).toBe(0);
@@ -129,7 +139,6 @@ describe("User Model", () => {
         const { UserModel } = await import("../src/models/userModel");
         const userModel = new UserModel(pool);
 
-        console.log("Finding all users on empty table");
         const users = await userModel.findAll(client);
 
         expect(users).toEqual([]);
