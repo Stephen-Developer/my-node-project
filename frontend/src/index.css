@@ -11,6 +11,9 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  display: flex;
+  justify-content: center;
 }
 
 a {
@@ -33,6 +36,11 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
 }
 
 button {
@@ -52,6 +60,21 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+nav {
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+  margin-top: 1em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 300px;
+  margin: 0 auto;
 }
 
 @media (prefers-color-scheme: light) {

@@ -4,7 +4,14 @@ export async function login(username: string, password: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
     });
-    return response.json();
+
+    const data = await response.json();
+
+    return {
+        ok: response.ok,
+        status: response.status,
+        ...data
+    };
 }
 
 export async function register(username: string, password: string) {
@@ -13,5 +20,12 @@ export async function register(username: string, password: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
     });
-    return response.json();
+
+    const data = await response.json();
+
+    return {
+        ok: response.ok,
+        status: response.status,
+        ...data
+    };
 }
