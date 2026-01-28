@@ -6,18 +6,20 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleLogin = async (username: string, password: string) => {
-        const result = await login(username, password);
-        console.log(result);
-        console.log(result.ok);
+        try {
+            const result = await login(username, password);
 
-        if(!result.ok) {
-            alert("Login failed: " + result.message);
-            return;
+            if (!result.ok) {
+                alert("Login Failed: " + result.message);
+                return;
+            }
+
+            localStorage.setItem("loggedIn", "true");
+            navigate('/UserDashboard');
         }
-
-        console.log("Login successful:", result);
-        localStorage.setItem("loggedIn", "true");
-        navigate('/UserDashboard');
+        catch (err: any) {
+            alert("Login Failed: " + err.message);
+        }
     };
 
     return <AuthForm title=" Login " onSubmit={handleLogin} />;

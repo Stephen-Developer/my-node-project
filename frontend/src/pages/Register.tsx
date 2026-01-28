@@ -6,17 +6,21 @@ export default function Register() {
     const navigate = useNavigate();
 
     const handleRegister = async (username: string, password: string) => {
-        const result = await register(username, password);
+        try {
+            const result = await register(username, password);
 
-        if (!result.ok) {
-            alert("Registration failed: " + result.message);
-            return;
+            if (!result.ok) {
+                alert("Registration failed: " + result.message);
+                return;
+            }
+
+            alert("Registration successful!\nPlease proceed to login.");
+            navigate('/');
+        }
+        catch (error: any) {
+            alert("Registration failed: " + error.message);
         }
 
-        alert("Registration successful!\nPlease proceed to login.");
-        navigate('/');
-
-        console.log(result);
     };
 
     return <AuthForm title=" Register " onSubmit={handleRegister} />;

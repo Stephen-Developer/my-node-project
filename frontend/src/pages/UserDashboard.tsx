@@ -23,9 +23,6 @@ export default function UserDashboard() {
             catch (error) {
                 console.error("Error fetching users:", error);
             }
-            finally {
-
-            }
         };
 
         loadUsers();
@@ -45,6 +42,7 @@ export default function UserDashboard() {
 
         deleteAllUsers();
         alert("All users have been deleted.");
+        localStorage.removeItem("loggedIn");
         navigate('/');
     }
 
