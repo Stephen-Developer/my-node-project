@@ -6,6 +6,7 @@ export function createMockUserService(): jest.Mocked<IUserService> {
     return {
         createNewUser: jest.fn(),
         checkUserPassword: jest.fn(),
+        updateUserPassword: jest.fn(),
         fetchUserData: jest.fn(),
         resetData: jest.fn()
     };
@@ -15,6 +16,7 @@ export function createMockUserModel(): jest.Mocked<IUserModel> {
     return {
         create: jest.fn(),
         getPasswordHash: jest.fn(),
+        updatePasswordHash: jest.fn(),
         findAll: jest.fn(),
         resetAll: jest.fn()
     };

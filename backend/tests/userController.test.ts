@@ -94,6 +94,52 @@ describe("User Controller", () => {
         expect(res.json).toHaveBeenCalledWith({ message: 'Invalid password' });
     });
 
+    test("updates user password and sends response", async () => {
+        const req: Partial<Request<{}, {}, { username: string; oldPassword: string; newPassword: string }>> = {
+            body: {
+                username: "testuser",
+                oldPassword: "oldpassword",
+                newPassword: "newpassword"
+            }
+        };
+
+        const res: Partial<Response> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        mockUserService.updateUserPassword.mockResolvedValue(true);
+
+        await userController.updateUserPassword(req as Request<{}, {}, { username: string, oldPassword: string; newPassword: string }>, res as Response);
+
+        expect(mockUserService.updateUserPassword).toHaveBeenCalledWith("testuser", "oldpassword", "newpassword");
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({message: 'Password updated successfully', result: true});
+    });
+
+    test("fails to update user password, sends error response", async () => {
+        const req: Partial<Request<{}, {}, { username: string; oldPassword: string; newPassword: string }>> = {
+            body: {
+                username: "testuser",
+                oldPassword: "oldpassword",
+                newPassword: "newpassword"
+            }
+        };
+
+        const res: Partial<Response> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        mockUserService.updateUserPassword.mockResolvedValue(false);
+
+        await userController.updateUserPassword(req as Request<{}, {}, { username: string, oldPassword: string; newPassword: string }>, res as Response);
+
+        expect(mockUserService.updateUserPassword).toHaveBeenCalledWith("testuser", "oldpassword", "newpassword");
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Username or password is incorrect' });
+    });
+
     test("fetches user data and sends response", async () => {
         const req: Partial<Request> = {};
 

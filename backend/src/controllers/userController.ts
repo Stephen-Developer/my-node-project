@@ -33,6 +33,20 @@ export class UserController implements IUserController {
         }
     };
 
+    updateUserPassword = async (
+        req: Request<{}, {}, { username: string; oldPassword: string; newPassword: string }>,
+        res: Response
+    ): Promise<void> => {
+        const { username, oldPassword, newPassword } = req.body;
+
+        const result = await this.userService.updateUserPassword(username, oldPassword, newPassword);
+        if (!result) {
+            res.status(401).json({ message: 'Username or password is incorrect' });
+            return;
+        }
+        res.status(200).json({ message: 'Password updated successfully', result });
+    };
+
     getUserData = async (req: Request, res: Response): Promise<void> => {
         const users = await this.userService.fetchUserData();
         res.status(200).json({ users });
