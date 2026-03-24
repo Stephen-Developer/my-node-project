@@ -3,6 +3,7 @@ import { IUserModel } from "../src/models/IUserModel";
 import { IPasswordService } from "../src/services/IPasswordService";
 import { User } from "../src/types/user";
 import { createMockUserModel, createMockPasswordService, clearAllMocks } from "./mockFactory";
+import { mock } from "node:test";
 
 describe("User Service", () => {
     let userService: UserService;
@@ -90,6 +91,60 @@ describe("User Service", () => {
 
         expect(mockUserModel.getPasswordHash).toHaveBeenCalledWith(username);
         expect(mockPasswordService.verifyPassword).toHaveBeenCalledWith(plainPassword, hashedPassword);
+        expect(result).toBe(false);
+    });
+
+    test("updates user password successfully", async () => {
+        const username = "testuser";
+        const oldPassword = "oldpassword";
+        const newPassword = "newpassword";
+        const oldHashedPassword = "oldhashedpassword";
+        const newHashedPassword = "newhashedpassword";
+        
+        mockUserModel.getPasswordHash.mockResolvedValue(oldHashedPassword);
+        mockPasswordService.verifyPassword.mockReturnValue(true);
+        mockPasswordService.hashPassword.mockReturnValue(newHashedPassword);
+
+        const result = await userService.updateUserPassword(username, oldPassword, newPassword);
+
+        expect(mockUserModel.getPasswordHash).toHaveBeenCalledWith(username);
+        expect(mockPasswordService.verifyPassword).toHaveBeenCalledWith(oldPassword, oldHashedPassword);
+        expect(mockPasswordService.hashPassword).toHaveBeenCalledWith(newPassword);
+        expect(mockUserModel.updatePasswordHash).toHaveBeenCalledWith(username, newHashedPassword);
+        expect(result).toBe(true);
+    });
+
+    test("fails to update user password with incorrect old password", async () => {
+        const username = "testuser";
+        const oldPassword = "wrongoldpassword";
+        const newPassword = "newpassword";
+        const oldHashedPassword = "oldhashedpassword";
+
+        mockUserModel.getPasswordHash.mockResolvedValue(oldHashedPassword);
+        mockPasswordService.verifyPassword.mockReturnValue(false);
+
+        const result = await userService.updateUserPassword(username, oldPassword, newPassword);
+
+        expect(mockUserModel.getPasswordHash).toHaveBeenCalledWith(username);
+        expect(mockPasswordService.verifyPassword).toHaveBeenCalledWith(oldPassword, oldHashedPassword);
+        expect(mockPasswordService.hashPassword).not.toHaveBeenCalled();
+        expect(mockUserModel.updatePasswordHash).not.toHaveBeenCalled();
+        expect(result).toBe(false);
+    });
+
+    test("fails to update user password when the user does not exits", async () => {
+        const username = "nonexistentuser";
+        const oldPassword = "oldpassword";
+        const newPassword = "newpassword";
+
+        mockUserModel.getPasswordHash.mockResolvedValue(null);
+
+        const result = await userService.updateUserPassword(username, oldPassword, newPassword);
+
+        expect(mockUserModel.getPasswordHash).toHaveBeenCalledWith(username);
+        expect(mockPasswordService.verifyPassword).not.toHaveBeenCalled();
+        expect(mockPasswordService.hashPassword).not.toHaveBeenCalled();
+        expect(mockUserModel.updatePasswordHash).not.toHaveBeenCalled();
         expect(result).toBe(false);
     });
 

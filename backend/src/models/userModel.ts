@@ -36,6 +36,18 @@ export class UserModel implements IUserModel {
         return res.rows[0]?.password ?? null;
     };
 
+    async updatePasswordHash (
+        username: string,
+        newHash: string,
+        client?: Pool | PoolClient
+    ): Promise<void> {
+        const db = client ?? this.db;
+        await db.query(
+            'UPDATE users SET password = $1 WHERE username = $2',
+            [newHash, username]
+        );
+    };
+
     async resetAll (client?: Pool | PoolClient): Promise<number> {
         const db = client ?? this.db;
         const res = await db.query('DELETE FROM users');

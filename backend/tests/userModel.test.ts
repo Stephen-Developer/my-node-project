@@ -69,11 +69,11 @@ describe("User Model", () => {
             password: "mypassword"
         }
 
-        const user = await userModel.create(expectedUser, client);
+        await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [expectedUser.username, expectedUser.password]);
 
         const hash = await userModel.getPasswordHash(expectedUser.username, client);
 
-        expect(hash).toBe(user.password);
+        expect(hash).toBe(expectedUser.password);
     });
 
     test("finds all users", async () => {
@@ -85,14 +85,34 @@ describe("User Model", () => {
             { username: "frank", password: "5678" }
         ];
 
-        await userModel.create(expectedUsers[0], client);
-        await userModel.create(expectedUsers[1], client);
+        await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [expectedUsers[0].username, expectedUsers[0].password]);
+        await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [expectedUsers[1].username, expectedUsers[1].password]);
 
         const users = await userModel.findAll(client);
 
         expect(users.length).toBe(2);
 
         expect(users).toMatchObject<User[]>(expectedUsers);
+    });
+
+    test("updates user password hash", async () => {
+        const { UserModel } = await import("../src/models/userModel");
+        const userModel = new UserModel(pool);
+
+        const originalUser: User = {
+            username: "grace",
+            password: "oldpass"
+        };
+
+        const newPasswordHash = "newHashedPass";
+
+        await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [originalUser.username, originalUser.password]);
+
+        await userModel.updatePasswordHash(originalUser.username, newPasswordHash, client);
+
+        const updatedHash = await client.query('SELECT password FROM users WHERE username = $1', [originalUser.username]);
+
+        expect(updatedHash.rows[0].password).toBe(newPasswordHash);
     });
 
     test("resets all users", async () => {
@@ -104,8 +124,8 @@ describe("User Model", () => {
             { username: "dave", password: "pass2" }
         ];
 
-        await userModel.create(expectedUsers[0], client);
-        await userModel.create(expectedUsers[1], client);
+        await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [expectedUsers[0].username, expectedUsers[0].password]);
+        await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [expectedUsers[1].username, expectedUsers[1].password]);
 
         let users = await userModel.findAll(client);
         expect(users.length).toBe(2);

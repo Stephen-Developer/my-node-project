@@ -26,6 +26,16 @@ export class UserService implements IUserService {
         return isMatch;
     };
 
+    updateUserPassword = async (username: string, oldPassword: string, newPassword: string): Promise<boolean> => {
+        const isOldPasswordValid = await this.checkUserPassword(username, oldPassword);
+        if (!isOldPasswordValid) {
+            return false;
+        }
+        const newHashedPassword = this.passwordService.hashPassword(newPassword);
+        await this.userModel.updatePasswordHash(username, newHashedPassword);
+        return true;
+    }
+
     fetchUserData = async (): Promise<User[]> => {
         const users = await this.userModel.findAll();
         return users;

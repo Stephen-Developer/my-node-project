@@ -5,5 +5,6 @@ export interface IUserModel {
     findAll(client? : Pool | PoolClient): Promise<User[]>;
     create(user: User, client? : Pool | PoolClient): Promise<User>;
     getPasswordHash(username: string, client? : Pool | PoolClient): Promise<string | null>;
+    updatePasswordHash(username: string, newHash: string, client? : Pool | PoolClient): Promise<void>;
     resetAll(client? : Pool | PoolClient): Promise<number>;
 }

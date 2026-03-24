@@ -32,6 +32,33 @@ export class UserRouter {
          *         description: New user creation failed
          */
         this.router.post('/createNewUser', userValidation.validateUserDetails, asyncHandler(this.userController.createUser));
+
+        /**
+         * @swagger
+         * /users/updateUserPassword:
+         *   post:
+         *     summary: Update user password
+         *     tags: [Users]
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               username:
+         *                 type: string
+         *               oldPassword:
+         *                 type: string
+         *               newPassword:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Password updated successfully
+         *       401:
+         *         description: Password update failed
+         */
+        this.router.post('/updateUserPassword', userValidation.validateUserDetails, asyncHandler(this.userController.updateUserPassword));
         
         /**
          * @swagger
