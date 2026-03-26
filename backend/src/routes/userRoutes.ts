@@ -48,7 +48,7 @@ export class UserRouter {
          *             properties:
          *               username:
          *                 type: string
-         *               oldPassword:
+         *               password:
          *                 type: string
          *               newPassword:
          *                 type: string
@@ -58,7 +58,7 @@ export class UserRouter {
          *       401:
          *         description: Password update failed
          */
-        this.router.post('/updateUserPassword', userValidation.validateUserDetails, asyncHandler(this.userController.updateUserPassword));
+        this.router.post('/updateUserPassword', userValidation.validatePasswordChange, asyncHandler(this.userController.updateUserPassword));
         
         /**
          * @swagger

@@ -14,6 +14,7 @@ export default function Login() {
                 return;
             }
 
+            localStorage.setItem("currentUserName", username);
             localStorage.setItem("loggedIn", "true");
             navigate('/UserDashboard');
         }

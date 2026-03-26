@@ -1,6 +1,7 @@
 vi.mock("../api/users", () => ({
     fetchUsers: vi.fn(),
     deleteAllUsers: vi.fn(),
+    updatePassword: vi.fn(),
 }));
 
 vi.mock("react-router-dom", async() => {
@@ -14,7 +15,7 @@ vi.mock("react-router-dom", async() => {
 import { describe, test, expect, vi, type Mock} from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useNavigate } from "react-router-dom";
-import { deleteAllUsers, fetchUsers } from "../api/users";
+import { deleteAllUsers, fetchUsers, updatePassword } from "../api/users";
 import UserDashboard from "./UserDashboard";
 
 describe("UserDashboard", () => {
@@ -110,6 +111,114 @@ describe("UserDashboard", () => {
         expect(window.alert).not.toHaveBeenCalled();
         expect(localStorage.getItem("loggedIn")).toBe("true");
         expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    test("update password", async() => {
+        const mockNavigate = vi.fn();
+        (useNavigate as Mock).mockReturnValue(mockNavigate);
+        (fetchUsers as Mock).mockResolvedValue([]);
+
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("currentUserName", "alice");
+
+        render(<UserDashboard />);
+
+        const oldPasswordInput = screen.getByPlaceholderText("old password");
+        const newPasswordInput = screen.getByPlaceholderText("new password");
+        const confirmPasswordInput = screen.getByPlaceholderText("confirm new password");
+
+        fireEvent.change(oldPasswordInput, { target: { value: "oldpass" } });
+        fireEvent.change(newPasswordInput, { target: { value: "newpass" } });
+        fireEvent.change(confirmPasswordInput, { target: { value: "newpass" } });
+
+        (updatePassword as Mock).mockResolvedValue({ ok: true, message: "Password updated successfully" });
+
+        fireEvent.click(screen.getByRole("button", { name: "Update Password" }));
+
+        await waitFor(() => {
+            expect(window.alert).toHaveBeenCalledWith("Password updated successfully!");
+            expect(oldPasswordInput).toHaveValue("");
+            expect(newPasswordInput).toHaveValue("");
+            expect(confirmPasswordInput).toHaveValue("");
+        });
+    });
+
+    test("update password with non-matching new passwords", async() => {
+        const mockNavigate = vi.fn();
+        (useNavigate as Mock).mockReturnValue(mockNavigate);
+        (fetchUsers as Mock).mockResolvedValue([]);
+
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("currentUserName", "alice");
+
+        render(<UserDashboard />);
+
+        const oldPasswordInput = screen.getByPlaceholderText("old password");
+        const newPasswordInput = screen.getByPlaceholderText("new password");
+        const confirmPasswordInput = screen.getByPlaceholderText("confirm new password");
+
+        fireEvent.change(oldPasswordInput, { target: { value: "oldpass" } });
+        fireEvent.change(newPasswordInput, { target: { value: "newpass" } });
+        fireEvent.change(confirmPasswordInput, { target: { value: "confirmpass" } });
+
+        fireEvent.click(screen.getByRole("button", { name: "Update Password" }));
+
+        expect(window.alert).toHaveBeenCalledWith("New password and confirm password do not match.");
+        expect(updatePassword).not.toHaveBeenCalled();
+    });
+
+    test("update password failure", async() => {
+        const mockNavigate = vi.fn();
+        (useNavigate as Mock).mockReturnValue(mockNavigate);
+        (fetchUsers as Mock).mockResolvedValue([]);
+        
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("currentUserName", "alice");
+
+        render(<UserDashboard />);
+
+        const oldPasswordInput = screen.getByPlaceholderText("old password");
+        const newPasswordInput = screen.getByPlaceholderText("new password");
+        const confirmPasswordInput = screen.getByPlaceholderText("confirm new password");
+
+        fireEvent.change(oldPasswordInput, { target: { value: "oldpass" } });
+        fireEvent.change(newPasswordInput, { target: { value: "newpass" } });
+        fireEvent.change(confirmPasswordInput, { target: { value: "newpass" } });
+
+        (updatePassword as Mock).mockResolvedValue({ ok: false, message: "Password update failed" });
+
+        fireEvent.click(screen.getByRole("button", { name: "Update Password" }));
+
+        await waitFor(() => {
+            expect(window.alert).toHaveBeenCalledWith("Password update failed: Password update failed");
+        });
+    });
+
+    test("update password with error", async() => {
+        const mockNavigate = vi.fn();
+        (useNavigate as Mock).mockReturnValue(mockNavigate);
+        (fetchUsers as Mock).mockResolvedValue([]);
+        
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("currentUserName", "alice");
+
+        render(<UserDashboard />);
+
+        const oldPasswordInput = screen.getByPlaceholderText("old password");
+        const newPasswordInput = screen.getByPlaceholderText("new password");
+        const confirmPasswordInput = screen.getByPlaceholderText("confirm new password");
+
+        fireEvent.change(oldPasswordInput, { target: { value: "oldpass" } });
+        fireEvent.change(newPasswordInput, { target: { value: "newpass" } });
+        fireEvent.change(confirmPasswordInput, { target: { value: "newpass" } });
+
+        (updatePassword as Mock).mockRejectedValue(new Error("Network error"));
+
+        fireEvent.click(screen.getByRole("button", { name: "Update Password" }));
+
+        await waitFor(() => {
+            expect(window.alert).toHaveBeenCalledWith("Password update failed with an error: Network error");
+        });
     });
 
 });

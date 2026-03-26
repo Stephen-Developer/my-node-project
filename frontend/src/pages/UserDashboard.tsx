@@ -1,11 +1,14 @@
 import { fetchUsers, type User } from '../api/users';
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { deleteAllUsers } from '../api/users';
+import { deleteAllUsers, updatePassword } from '../api/users';
 
 export default function UserDashboard() {
     const [users, setUsers] = useState<User[]>([]);
     const navigate = useNavigate();
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -30,6 +33,7 @@ export default function UserDashboard() {
 
     const handleLogout = () => { 
         localStorage.removeItem("loggedIn");
+        localStorage.removeItem("currentUserName");
         navigate('/'); 
     };
 
@@ -46,12 +50,68 @@ export default function UserDashboard() {
         navigate('/');
     }
 
+    const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            alert("New password and confirm password do not match.");
+            return;
+        }
+
+        const currentUserName = localStorage.getItem("currentUserName") || "";
+
+        try {
+            const result = await updatePassword(currentUserName, oldPassword, newPassword);
+
+            if (!result.ok) {
+                alert("Password update failed: " + result.message);
+                return;
+            }
+
+            alert("Password updated successfully!");
+            setOldPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+        }
+        catch (error: any) {
+            alert("Password update failed with an error: " + error.message);
+        }
+    }
+
     return (
         <div>
             <h2>User Dashboard</h2>
             <p>Welcome to the dashboard!</p>
             <button onClick={handleLogout}>Logout</button>
             <button onClick={handleResetAllUsers}>Delete All Users</button>
+            <form onSubmit={handleUpdatePassword}>
+                <h2>Update Password</h2>
+            
+                <input
+                    type="password"
+                    placeholder="old password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required
+                />
+            
+                <input
+                    type="password"
+                    placeholder="new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                />
+
+                <input
+                    type="password"
+                    placeholder="confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                />
+            
+            <button type="submit">Update Password</button>
+        </form>
             <h2>Users</h2>
             <ul>
                 {users.map((user) => (

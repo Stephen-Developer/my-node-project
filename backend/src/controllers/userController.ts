@@ -44,7 +44,7 @@ export class UserController implements IUserController {
             res.status(401).json({ message: 'Username or password is incorrect' });
             return;
         }
-        res.status(200).json({ message: 'Password updated successfully', result });
+        res.status(200).json({ message: 'Password updated successfully' });
     };
 
     getUserData = async (req: Request, res: Response): Promise<void> => {

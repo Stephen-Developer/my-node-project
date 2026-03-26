@@ -17,3 +17,22 @@ export const validateUserDetails = [
         next();
     }
 ];
+
+export const validatePasswordChange = [
+    body('username')
+        .isString().withMessage('Username must be a string')
+        .isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
+    body('oldPassword')
+        .isString().withMessage('Old password must be a string')
+        .isLength({ min: 6 }).withMessage('Old password must be at least 6 characters long'),
+    body('newPassword')
+        .isString().withMessage('New password must be a string')
+        .isLength({ min: 6 }).withMessage('New password must be at least 6 characters long'),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+];
